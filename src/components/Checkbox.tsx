@@ -18,6 +18,8 @@ export const Checkbox = (props: CheckboxProps) => {
       mb={props.mb}
       isChecked={props.isChecked}
       onChange={props.onChange}
+      size="sm"
+      color="gray.400"
     >
       {props.content}
     </Chakra.Checkbox>
