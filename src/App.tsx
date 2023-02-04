@@ -1,4 +1,4 @@
-import { Box, ChakraProvider, Container, Flex, Stack, Text, useToast, Button as ChakraButton } from "@chakra-ui/react";
+import { Box, ChakraProvider, Flex, Stack, Text, useToast, Button as ChakraButton } from "@chakra-ui/react";
 import { Button } from "./components/Button";
 import { Checkbox } from "./components/Checkbox";
 import { Input } from "./components/Input";
