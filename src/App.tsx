@@ -14,19 +14,24 @@ function App() {
         h="100vh" 
         display="flex" 
         alignItems="center"
-        justifyContent="center" 
+        justifyContent="center"
+        px="24px" 
       >
-        <Stack spacing="16px" align={""}>
-          <Text 
-            fontWeight="bold"
-            fontFamily="JetBrains Mono" 
-            fontSize="24px"
+        <Stack w="full" spacing="16px" align="center">
+          <Box
+            w={{ base: "full", md: "350px" }}
           >
-            dconsti._
-          </Text>
+            <Text 
+              fontWeight="bold"
+              fontFamily="JetBrains Mono" 
+              fontSize="24px"
+            >
+              dconsti._
+            </Text>
+          </Box>
           <Box 
             bg="gray.800" 
-            w="350px"
+            w={{ base: "full", md: "350px" }}
             p="24px" 
             borderRadius="md"
           >
