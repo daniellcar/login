@@ -1,3 +1,5 @@
+import "@fontsource/jetbrains-mono"
+
 import { Box, ChakraProvider, Flex, Stack, Text, useToast, Button as ChakraButton } from "@chakra-ui/react";
 import { Button } from "./components/Button";
 import { Checkbox } from "./components/Checkbox";
