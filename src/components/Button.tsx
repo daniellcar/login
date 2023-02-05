@@ -16,7 +16,6 @@ export const Button = (props: ButtonProps) => {
       mb={props.mb}
       onClick={props.onClick}
       onSubmit={props.onSubmit}
-
       bg="blue.500"
       _hover={{ bg: "blue.600" }}
       w="full"

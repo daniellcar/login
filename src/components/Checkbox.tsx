@@ -10,8 +10,6 @@ interface CheckboxProps {
 }
 
 export const Checkbox = (props: CheckboxProps) => {
-
-
   return (
     <Chakra.Checkbox
       mt={props.mt}

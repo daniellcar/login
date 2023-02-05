@@ -14,4 +14,4 @@ const baseStyle = defineStyle({
 
 export const Input = defineStyleConfig({
   baseStyle,
-})
+});
