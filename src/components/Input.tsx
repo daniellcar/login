@@ -22,7 +22,7 @@ export const Input = (props: InputProps) => {
       <FormLabel fontSize="sm" color="gray.400">
         {props.label}
       </FormLabel>
-      <Chakra.Input type={props.type} onChange={props.onChange} />
+      <Chakra.Input required type={props.type} onChange={props.onChange} bg="gray.900" />
       <FormErrorMessage>{props.errorMessage}</FormErrorMessage>
     </FormControl>
   );

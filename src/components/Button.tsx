@@ -5,8 +5,9 @@ interface ButtonProps {
   content: string;
   mt?: SpaceProps["mt"];
   mb?: SpaceProps["mb"];
+  isLoading?: boolean;
+  isDisabled?: boolean;
   onClick?: () => void;
-  onSubmit?: () => void;
 }
 
 export const Button = (props: ButtonProps) => {
@@ -14,11 +15,12 @@ export const Button = (props: ButtonProps) => {
     <Chakra.Button
       mt={props.mt}
       mb={props.mb}
+      type="submit"
       onClick={props.onClick}
-      onSubmit={props.onSubmit}
-
       bg="blue.500"
       _hover={{ bg: "blue.600" }}
+      isLoading={props.isLoading}
+      isDisabled={props.isDisabled}
       w="full"
     >
       {props.content}
