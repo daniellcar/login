@@ -1,15 +1,19 @@
 import "@fontsource/jetbrains-mono";
 import React from "react";
-import { Flex, Stack, Button as ChakraButton, Text, PinInput, PinInputField, HStack } from "@chakra-ui/react";
+import {
+  Button as ChakraButton,
+  Text,
+  PinInput,
+  PinInputField,
+  HStack,
+} from "@chakra-ui/react";
 
-import { Input } from "../../../components/Input";
 import { Button } from "../../../components/Button";
-import { Checkbox } from "../../../components/Checkbox";
-import { AuthStore } from "../../../stores/auth";
-import { chakra, shouldForwardProp } from "@chakra-ui/react";
+import { chakra } from "@chakra-ui/react";
+import { useAppDispatch, useAppSelector } from "../../../redux";
+import { authActions } from "../../../redux/slices/auth";
 
 interface ValidationCodeScreenProps {
-  authStore: AuthStore;
   onConfirmValidationCodeClick: (
     event: React.FormEvent<HTMLFormElement>
   ) => void;
@@ -17,10 +21,11 @@ interface ValidationCodeScreenProps {
 }
 
 function ValidationCodeScreen(props: ValidationCodeScreenProps) {
+  const authState = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+
   return (
-    <chakra.form
-      onSubmit={(event) => props.onConfirmValidationCodeClick(event)}
-    >
+    <chakra.form onSubmit={props.onConfirmValidationCodeClick}>
       <ChakraButton
         variant="link"
         size="sm"
@@ -35,17 +40,23 @@ function ValidationCodeScreen(props: ValidationCodeScreenProps) {
         please enter the code we sent to the email address you provided.
       </Text>
       <HStack mb="32px" w="full" spacing="12px">
-        <PinInput otp size="lg" onChange={props.authStore.setValidationCode}>
+        <PinInput
+          otp
+          size="lg"
+          onChange={(event) =>
+            dispatch(authActions.validation_code_updated(event))
+          }
+        >
           <PinInputField />
           <PinInputField />
           <PinInputField />
           <PinInputField />
         </PinInput>
       </HStack>
-      <Button 
-        isDisabled={props.authStore.validationCode.length !== 4}
-        isLoading={props.authStore.isLoading} 
-        content="confirm" 
+      <Button
+        isDisabled={authState.validationCode.length !== 4}
+        isLoading={authState.isLoading}
+        content="confirm"
       />
     </chakra.form>
   );

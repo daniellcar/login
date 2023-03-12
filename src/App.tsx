@@ -1,53 +1,60 @@
+import React from "react";
 import "@fontsource/jetbrains-mono";
-import { AnimatePresence, isValidMotionProp, motion } from "framer-motion";
-import { chakra, ChakraProvider, shouldForwardProp } from "@chakra-ui/react";
+import { ChakraProvider } from "@chakra-ui/react";
+import { subscribeBefore } from "redux-subscribe-action";
 
-import { useAuthStore } from "./stores/auth";
-import Auth from "./pages/Auth/Auth";
 import customTheme from "./theme";
-import { useApplicationStore } from "./stores/application";
-import Dashboard from "./pages/Dashboard";
+import TransitionContainer from "./components/TransitionContainer";
 
-const TransitionContainer = chakra(motion.div, {
-  shouldForwardProp: (prop) =>
-    isValidMotionProp(prop) || shouldForwardProp(prop),
-});
+import Dashboard from "./pages/Dashboard";
+import Auth from "./pages/auth/Auth";
+
+import { useAppDispatch, useAppSelector } from "./redux";
+import { authActions } from "./redux/slices/auth";
 
 function App() {
-  const authStore = useAuthStore((state) => state);
-  const applicationStore = useApplicationStore((state) => state);
+  const [isTransitioning, setIsTransitioning] = React.useState(false);
+  const [isLogged, setIsLogged] = React.useState(false);
+
+  const authState = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+
+  subscribeBefore((action) => {
+    if (action.type === authActions.user_authenticated.type) {
+      setIsLogged(true);
+      setIsTransitioning(true);
+    }
+
+    if (action.type === authActions.user_unauthenticated.type) {
+      setIsLogged(false);
+      setIsTransitioning(true);
+    }
+  });
 
   return (
     <ChakraProvider theme={customTheme}>
-      <AnimatePresence>
-        {!applicationStore.isTransitioning && !authStore.isLogged && (
-          <TransitionContainer
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onAnimationComplete={() => {
-              applicationStore.setIsTransitioning(false);
-              authStore.setIsLoading(false);
-            }}
-          >
-            <Auth />
-          </TransitionContainer>
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {!applicationStore.isTransitioning && authStore.isLogged && (
-          <TransitionContainer
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onAnimationComplete={() =>
-              applicationStore.setIsTransitioning(false)
-            }
-          >
-            <Dashboard />
-          </TransitionContainer>
-        )}
-      </AnimatePresence>
+      <TransitionContainer
+        condition={!authState.isTransitioning && !authState.isLogged}
+        onAnimationComplete={() => {
+          setIsTransitioning(false);
+          if (authState.isLoading) {
+            dispatch(authActions.loading_finished())
+          }
+        }}
+      >
+        <Auth />
+      </TransitionContainer>
+      <TransitionContainer
+        condition={!authState.isTransitioning && authState.isLogged}
+        onAnimationComplete={() => {
+          setIsTransitioning(false);
+          if (authState.isLoading) {
+            dispatch(authActions.loading_finished())
+          }
+        }}
+      >
+        <Dashboard />
+      </TransitionContainer>
     </ChakraProvider>
   );
 }

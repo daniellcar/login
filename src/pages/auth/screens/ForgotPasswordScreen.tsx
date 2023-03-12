@@ -4,10 +4,10 @@ import { Text, Button as ChakraButton, chakra } from "@chakra-ui/react";
 
 import { Input } from "../../../components/Input";
 import { Button } from "../../../components/Button";
-import { AuthStore } from "../../../stores/auth";
+import { useAppDispatch, useAppSelector } from "../../../redux";
+import { authActions } from "../../../redux/slices/auth";
 
 interface ForgotPasswordScreenProps {
-  authStore: AuthStore;
   onBackToLoginClick: () => void;
   onSendPasswordResetEmailClick: (
     event: React.FormEvent<HTMLFormElement>
@@ -15,6 +15,9 @@ interface ForgotPasswordScreenProps {
 }
 
 function ForgotPasswordScreen(props: ForgotPasswordScreenProps) {
+  const authState = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+
   return (
     <chakra.form
       onSubmit={(event) => props.onSendPasswordResetEmailClick(event)}
@@ -35,12 +38,12 @@ function ForgotPasswordScreen(props: ForgotPasswordScreenProps) {
       <Input
         label="email"
         onChange={(event) => {
-          props.authStore.setEmail(event.target.value);
+          dispatch(authActions.email_updated(event.target.value));
         }}
         type="email"
         mb="24px"
       />
-      <Button isLoading={props.authStore.isLoading} content="send" />
+      <Button isLoading={authState.isLoading} content="send" />
     </chakra.form>
   );
 }

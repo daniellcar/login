@@ -5,33 +5,45 @@ import { Flex, Stack, Button as ChakraButton } from "@chakra-ui/react";
 import { Input } from "../../../components/Input";
 import { Button } from "../../../components/Button";
 import { Checkbox } from "../../../components/Checkbox";
-import { AuthStore } from "../../../stores/auth";
+import { useAppSelector } from "../../../redux";
+import { SignInClickProps } from "../Auth";
 
 interface LoginScreenProps {
-  authStore: AuthStore;
   onForgotPasswordClick: () => void;
-  onSignInClick: (event: React.FormEvent<HTMLDivElement>) => void;
+  onSignInClick: (data: SignInClickProps) => void;
 }
 
 function LoginScreen(props: LoginScreenProps) {
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [rememberMe, setRememberMe] = React.useState(false);
+
+  const authState = useAppSelector((state) => state.auth);
+
   return (
     <Stack
       as="form"
-      onSubmit={(event) => props.onSignInClick(event)}
+      onSubmit={(event) => {
+        event.preventDefault();
+
+        props.onSignInClick({ email, password, rememberMe });
+      }}
       spacing="32px"
     >
       <Stack spacing="16px">
         <Stack>
           <Input
             label="email"
-            onChange={(event) => props.authStore.setEmail(event.target.value)}
+            onChange={(event) =>
+              setEmail(event.target.value)
+            }
             type="email"
             mb="24px"
           />
           <Input
             label="password"
             onChange={(event) =>
-              props.authStore.setPassword(event.target.value)
+              setPassword(event.target.value)
             }
             type="password"
           />
@@ -39,9 +51,9 @@ function LoginScreen(props: LoginScreenProps) {
         <Flex justifyContent="space-between">
           <Checkbox
             content="remember me"
-            isChecked={props.authStore.rememberMe}
+            isChecked={authState.rememberMe}
             onChange={(event) =>
-              props.authStore.setRememberMe(event.target.checked)
+              setRememberMe(event.target.checked)
             }
           />
           <ChakraButton
@@ -55,7 +67,7 @@ function LoginScreen(props: LoginScreenProps) {
           </ChakraButton>
         </Flex>
       </Stack>
-      <Button isLoading={props.authStore.isLoading} content="sign in" />
+      <Button isLoading={authState.isLoading} content="sign in" />
     </Stack>
   );
 }
