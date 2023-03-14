@@ -41,8 +41,8 @@ function ValidationCodeScreen() {
         },
         onInvalidValidationCode: () => {
           toast({
-            title: "invalid validation code",
-            description: "the validation code you entered is invalid.",
+            title: "incorrect validation code",
+            description: "the validation code you entered is incorrect.",
             status: "error",
             duration: 5000,
             isClosable: true,
