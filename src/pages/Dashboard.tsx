@@ -2,13 +2,13 @@ import "@fontsource/jetbrains-mono";
 import { Text, Container } from "@chakra-ui/react";
 
 import { Button } from "../components/Button";
-import { useAuthStore } from "../stores/auth";
-import * as actions from "../actions";
-import { useApplicationStore } from "../stores/application";
+import unauthenticateUserCommand from "../commands/auth/unauthenticate-user-command";
 
 function Dashboard() {
-  const authStore = useAuthStore((state) => state);
-  const applicationStore = useApplicationStore((state) => state);
+  const onSignOutClick = () => {
+    unauthenticateUserCommand();
+    localStorage.removeItem("@dconsti:token")
+  }
 
   return (
     <Container
@@ -28,10 +28,7 @@ function Dashboard() {
       >
         dconsti._
       </Text>
-      <Button
-        content="sign out"
-        onClick={() => actions.auth.signOut({ authStore, applicationStore })}
-      />
+      <Button content="sign out" onClick={onSignOutClick} />
     </Container>
   );
 }
