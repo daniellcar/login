@@ -2,16 +2,13 @@ import "@fontsource/jetbrains-mono";
 import { Text, Container } from "@chakra-ui/react";
 
 import { Button } from "../components/Button";
-
-import { useAppDispatch } from "../redux";
-import { authActions } from "../redux/slices/auth";
+import unauthenticateUserCommand from "../commands/auth/unauthenticate-user-command";
 
 function Dashboard() {
-  const dispatch = useAppDispatch();
-
   const onSignOutClick = () => {
-    dispatch(authActions.user_unauthenticated());
-  };
+    unauthenticateUserCommand();
+    localStorage.removeItem("@dconsti:token")
+  }
 
   return (
     <Container

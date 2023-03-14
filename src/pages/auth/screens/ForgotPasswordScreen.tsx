@@ -1,34 +1,83 @@
 import "@fontsource/jetbrains-mono";
 import React from "react";
-import { Text, Button as ChakraButton, chakra } from "@chakra-ui/react";
+import {
+  Text,
+  Button as ChakraButton,
+  chakra,
+  useToast,
+} from "@chakra-ui/react";
+
+import { useAppSelector } from "../../../redux";
 
 import { Input } from "../../../components/Input";
 import { Button } from "../../../components/Button";
-import { useAppDispatch, useAppSelector } from "../../../redux";
-import { authActions } from "../../../redux/slices/auth";
 
-interface ForgotPasswordScreenProps {
-  onBackToLoginClick: () => void;
-  onSendPasswordResetEmailClick: (
-    event: React.FormEvent<HTMLFormElement>
-  ) => void;
-}
+import navigateToScreenCommand from "../../../commands/auth/go-to-screen-command";
+import sendPasswordResetEmailCommand from "../../../commands/auth/send-password-reset-email-command";
+import finishLoadingCommand from "../../../commands/auth/finish-loading-command";
 
-function ForgotPasswordScreen(props: ForgotPasswordScreenProps) {
+function ForgotPasswordScreen() {
+  const [email, setEmail] = React.useState<string>("");
+
   const authState = useAppSelector((state) => state.auth);
-  const dispatch = useAppDispatch();
+  const toast = useToast();
+
+  const onSendPasswordResetEmailClick = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    await sendPasswordResetEmailCommand(
+      { email },
+      {
+        onSuccess: () => {
+          navigateToScreenCommand({ screen: "validationCode" });
+        },
+        onEmailNotFound: () => {
+          toast({
+            title: "email not found",
+            description: "the email you entered does not exist.",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          });
+          finishLoadingCommand();
+        },
+        onBlockedUser: () => {
+          toast({
+            title: "blocked user",
+            description: "your account has been blocked.",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          });
+          finishLoadingCommand();
+        },
+        onUnknownError: () => {
+          toast({
+            title: "unknown error",
+            description: "an unknown error has occurred.",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          });
+          finishLoadingCommand();
+        },
+      }
+    );
+  };
+
+  const onBackToLoginClick = () => {
+    navigateToScreenCommand({ screen: "login" });
+  };
 
   return (
-    <chakra.form
-      onSubmit={(event) => props.onSendPasswordResetEmailClick(event)}
-    >
+    <chakra.form onSubmit={onSendPasswordResetEmailClick}>
       <ChakraButton
         variant="link"
         size="sm"
         color="blue.500"
         fontWeight="bold"
         mb="24px"
-        onClick={props.onBackToLoginClick}
+        onClick={onBackToLoginClick}
       >
         back to login
       </ChakraButton>
@@ -38,7 +87,7 @@ function ForgotPasswordScreen(props: ForgotPasswordScreenProps) {
       <Input
         label="email"
         onChange={(event) => {
-          dispatch(authActions.email_updated(event.target.value));
+          setEmail(event.target.value);
         }}
         type="email"
         mb="24px"

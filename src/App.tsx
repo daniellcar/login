@@ -1,60 +1,47 @@
-import React from "react";
 import "@fontsource/jetbrains-mono";
 import { ChakraProvider } from "@chakra-ui/react";
-import { subscribeBefore } from "redux-subscribe-action";
 
 import customTheme from "./theme";
-import TransitionContainer from "./components/TransitionContainer";
+import Animated from "./components/Animated";
 
 import Dashboard from "./pages/Dashboard";
-import Auth from "./pages/auth/Auth";
+import Auth from "./pages/auth/auth-page";
 
-import { useAppDispatch, useAppSelector } from "./redux";
-import { authActions } from "./redux/slices/auth";
+import { AnimatePresence } from "framer-motion";
+import { useAppSelector } from "./redux";
+import React from "react";
+import verifyTokenCommand from "./commands/auth/verify-token-command";
 
 function App() {
-  const [isTransitioning, setIsTransitioning] = React.useState(false);
-  const [isLogged, setIsLogged] = React.useState(false);
-
   const authState = useAppSelector((state) => state.auth);
-  const dispatch = useAppDispatch();
+  const token = localStorage.getItem("@dconsti:token");
 
-  subscribeBefore((action) => {
-    if (action.type === authActions.user_authenticated.type) {
-      setIsLogged(true);
-      setIsTransitioning(true);
-    }
-
-    if (action.type === authActions.user_unauthenticated.type) {
-      setIsLogged(false);
-      setIsTransitioning(true);
-    }
-  });
+  React.useEffect(() => {
+    verifyTokenCommand({ token: token as string }, {
+      onSuccess: () => {},
+      onInvalidToken: () => {
+        localStorage.removeItem("@dconsti:token");
+      },
+      onUnknownError: () => {
+        localStorage.removeItem("@dconsti:token");
+      },
+    })
+  }, []);
 
   return (
     <ChakraProvider theme={customTheme}>
-      <TransitionContainer
-        condition={!authState.isTransitioning && !authState.isLogged}
-        onAnimationComplete={() => {
-          setIsTransitioning(false);
-          if (authState.isLoading) {
-            dispatch(authActions.loading_finished())
-          }
-        }}
-      >
-        <Auth />
-      </TransitionContainer>
-      <TransitionContainer
-        condition={!authState.isTransitioning && authState.isLogged}
-        onAnimationComplete={() => {
-          setIsTransitioning(false);
-          if (authState.isLoading) {
-            dispatch(authActions.loading_finished())
-          }
-        }}
-      >
-        <Dashboard />
-      </TransitionContainer>
+      <AnimatePresence mode="wait">
+        {!authState.isLogged && (
+          <Animated key="authPage">
+            <Auth />
+          </Animated>
+        )}
+        {authState.isLogged && (
+          <Animated key="dashboardPage">
+            <Dashboard />
+          </Animated>
+        )}
+      </AnimatePresence>
     </ChakraProvider>
   );
 }

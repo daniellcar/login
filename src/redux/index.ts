@@ -1,7 +1,7 @@
-import { AnyAction, configureStore } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
-import authReducer from "./slices/auth";
+import authReducer from "./reducers/auth";
 import subscribeActionMiddleware from "redux-subscribe-action";
 
 const store = configureStore({
