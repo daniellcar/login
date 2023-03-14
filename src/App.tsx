@@ -1,51 +1,45 @@
 import "@fontsource/jetbrains-mono";
-import { AnimatePresence, isValidMotionProp, motion } from "framer-motion";
-import { chakra, ChakraProvider, shouldForwardProp } from "@chakra-ui/react";
+import { ChakraProvider } from "@chakra-ui/react";
 
-import { useAuthStore } from "./stores/auth";
-import Auth from "./pages/Auth/Auth";
 import customTheme from "./theme";
-import { useApplicationStore } from "./stores/application";
-import Dashboard from "./pages/Dashboard";
+import Animated from "./components/Animated";
 
-const TransitionContainer = chakra(motion.div, {
-  shouldForwardProp: (prop) =>
-    isValidMotionProp(prop) || shouldForwardProp(prop),
-});
+import Dashboard from "./pages/Dashboard";
+import Auth from "./pages/auth/auth-page";
+
+import { AnimatePresence } from "framer-motion";
+import { useAppSelector } from "./redux";
+import React from "react";
+import verifyTokenCommand from "./commands/auth/verify-token-command";
 
 function App() {
-  const authStore = useAuthStore((state) => state);
-  const applicationStore = useApplicationStore((state) => state);
+  const authState = useAppSelector((state) => state.auth);
+  const token = localStorage.getItem("@dconsti:token");
+
+  React.useEffect(() => {
+    verifyTokenCommand({ token: token as string }, {
+      onSuccess: () => {},
+      onInvalidToken: () => {
+        localStorage.removeItem("@dconsti:token");
+      },
+      onUnknownError: () => {
+        localStorage.removeItem("@dconsti:token");
+      },
+    })
+  }, []);
 
   return (
     <ChakraProvider theme={customTheme}>
-      <AnimatePresence>
-        {!applicationStore.isTransitioning && !authStore.isLogged && (
-          <TransitionContainer
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onAnimationComplete={() => {
-              applicationStore.setIsTransitioning(false);
-              authStore.setIsLoading(false);
-            }}
-          >
+      <AnimatePresence mode="wait">
+        {!authState.isLogged && (
+          <Animated key="authPage">
             <Auth />
-          </TransitionContainer>
+          </Animated>
         )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {!applicationStore.isTransitioning && authStore.isLogged && (
-          <TransitionContainer
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onAnimationComplete={() =>
-              applicationStore.setIsTransitioning(false)
-            }
-          >
+        {authState.isLogged && (
+          <Animated key="dashboardPage">
             <Dashboard />
-          </TransitionContainer>
+          </Animated>
         )}
       </AnimatePresence>
     </ChakraProvider>
