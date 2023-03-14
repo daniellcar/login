@@ -73,7 +73,7 @@ function ValidationCodeScreen() {
         change email
       </ChakraButton>
       <Text mb="16px" fontSize="16px">
-        please enter the code we sent to the email address you provided.
+        enter the code we sent to the email address you provided.
       </Text>
       <FormControl>
         <FormLabel fontSize="sm" color="gray.400">
