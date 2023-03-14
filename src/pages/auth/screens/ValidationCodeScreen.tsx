@@ -32,7 +32,7 @@ function ValidationCodeScreen() {
         onSuccess: () => {
           toast({
             title: "success",
-            description: "sour password has been changed.",
+            description: "your password has been changed.",
             status: "success",
             duration: 5000,
             isClosable: true,
